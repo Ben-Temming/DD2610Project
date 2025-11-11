@@ -7,6 +7,7 @@ import contextlib
 import numpy as np
 from inspect import signature
 from collections import OrderedDict
+from tqdm import tqdm
 
 import torch
 from torch.amp import GradScaler, autocast
@@ -15,7 +16,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 from semilearn.core.criterions import ConsistencyLoss
 from semilearn.core.hooks import (
-    AimHook,
+    # AimHook,
     CheckpointHook,
     DistSamplerSeedHook,
     EMAHook,
@@ -257,8 +258,8 @@ class AlgorithmBase:
         self.register_hook(LoggingHook(), None, "LOWEST")
         if self.args.use_wandb:
             self.register_hook(WANDBHook(), None, "LOWEST")
-        if self.args.use_aim:
-            self.register_hook(AimHook(), None, "LOWEST")
+        # if self.args.use_aim:
+        #     self.register_hook(AimHook(), None, "LOWEST")
 
     def set_scaler(self, input_range=(0, 1), output_range=(0, 1)):
         scaler = TorchMinMaxScaler(output_range=output_range)
@@ -350,7 +351,9 @@ class AlgorithmBase:
 
             self.call_hook("before_train_epoch")
 
-            for data_lb, data_ulb in zip(self.loader_dict["train_lb"], self.loader_dict["train_ulb"]):
+            # for data_lb, data_ulb in zip(self.loader_dict["train_lb"], self.loader_dict["train_ulb"]):
+            for data_lb, data_ulb in tqdm(zip(self.loader_dict["train_lb"], self.loader_dict["train_ulb"]), total=self.num_iter_per_epoch,
+                         desc=f"Epoch {epoch}/{self.epochs}"):
                 # prevent the training iterations exceed args.num_train_iter
                 if self.it >= self.num_train_iter:
                     break
