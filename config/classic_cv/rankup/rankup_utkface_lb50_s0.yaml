@@ -35,7 +35,7 @@ net_from_name: False
 data_dir: ./data
 dataset: utkface
 train_sampler: RandomSampler
-num_workers: 4
+num_workers: 0 # set to 0 for windows as there is multi-processor issue 4
 crop_ratio: 0.875
 img_size: 40
 preload: False

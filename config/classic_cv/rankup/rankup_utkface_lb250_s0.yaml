@@ -10,7 +10,7 @@ use_aim: False
 epoch: 256
 num_train_iter: 262144
 num_eval_iter: 1024
-num_log_iter: 256
+num_log_iter: 1 #256
 num_labels: 250
 batch_size: 32
 eval_batch_size: 256
@@ -35,7 +35,7 @@ net_from_name: False
 data_dir: ./data
 dataset: utkface
 train_sampler: RandomSampler
-num_workers: 4
+num_workers: 0 # set to 0 for windows as there is multi-processor issue 4
 crop_ratio: 0.875
 img_size: 40
 preload: False
