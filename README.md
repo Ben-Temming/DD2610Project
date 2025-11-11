@@ -32,6 +32,46 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a> -->
 
+
+<h1 align="center">Updated Instructions</h1>
+
+### Installation
+
+1.  Create the conda environment:
+    ```bash
+    conda env create -f conda_environment.yaml
+    ```
+2.  Activate the environment:
+    ```bash
+    conda activate ssr
+    ```
+3.  Test CUDA installation:
+    ```bash
+    python -c "import torch; print(torch.version.cuda, torch.cuda.is_available())"
+    ```
+
+### Testing
+
+Run the training script with the following command:
+
+```bash
+python train.py --gpu 0 --c config/classic_cv/rankup/rankup_utkface_lb250_s0.yaml
+```
+
+**NOTE:** Before running this locally on Windows, you may need to make the following changes in the `config/classic_cv/rankup/rankup_utkface_lb250_s0.yaml` file:
+*   Set `num_workers` to `0`. This is to avoid a multi-threading issue on Windows that can prevent data from being loaded.
+*   Set `num_log_iter` to `1` (or a lower number). The default is `256`, which can be very slow on a laptop GPU. This will allow you to see the TensorBoard output more quickly.
+
+### Tensorboard
+
+To view the Tensorboard graph, run:
+```bash
+tensorboard --logdir=./saved_models/classic_cv/rankup_utkface_lb250_s0/tensorboard/
+```
+
+
+
+
 <h1 align="center">🎋 Semi-Supervised Regression</h1>
 
 <p align="center">
