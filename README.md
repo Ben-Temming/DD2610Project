@@ -69,6 +69,63 @@ To view the Tensorboard graph, run:
 tensorboard --logdir=./saved_models/classic_cv/rankup_utkface_lb250_s0/tensorboard/
 ```
 
+### Wandb
+
+For logging, you can use `wandb` as an alternative to TensorBoard.
+
+#### Offline Mode
+
+To log experiments locally, you can use `wandb` in offline mode. This is useful for tracking experiments without an internet connection.
+
+1.  In your `.yaml` configuration file, set `use_wandb` to `True`.
+2.  Set `wandb_mode` to `offline`.
+
+Example configuration:
+```yaml
+use_wandb: True
+wandb_mode: offline
+```
+
+Your logs will be saved locally in the `wandb` directory under the `saved_models` directory.
+
+
+#### Online Mode
+
+To sync your logs with the Weights & Bienses cloud service (https://wandb.ai/site/), use the online mode. This allows you to view and manage your experiments from anywhere through their web interface.
+
+1.  **Create a `.env` file** in the root of the project.
+
+    For Linux or macOS, use this command:
+    ```bash
+    cp .env.template .env
+    ```
+
+    For Windows, use this command:
+    ```bash
+    copy .env.template .env
+    ```
+2.  **Add your WANDB_API_KEY** to the `.env` file:
+    ```
+    WANDB_API_KEY=your_api_key_here
+    ```
+3.  **Enable `wandb` in your configuration file**:
+    In your `.yaml` configuration file (e.g., `rankup_utkface_lb250_s0.yaml`), set `use_wandb` to `True` and ensure `wandb_mode` is set to `online` 
+
+    Example configuration:
+    ```yaml
+    use_wandb: True
+    wandb_mode: online
+    ```
+    > **Note:** For online mode, you can also specify the project and run name in the `.yaml` file. This helps organize your experiments in the `wandb` dashboard.
+    ```yaml
+    wandb_online_logging:
+      project: DD2610Project
+      name: classic_cv_rankup_utkface_lb250_s0
+    ```
+    > The `project` should be the same for all runs within the same project, and the `name` should be unique for each experiment.
+
+Now, when you run your training, the logs will be synced to your `wandb` account.
+
 
 
 
