@@ -9,6 +9,9 @@ import warnings
 import argparse
 import numpy as np
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import torch
 import torch.nn.parallel
 import torch.distributed as dist

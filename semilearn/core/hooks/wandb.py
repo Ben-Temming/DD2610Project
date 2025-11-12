@@ -33,8 +33,20 @@ class WANDBHook(Hook):
         ]
 
     def before_run(self, algorithm):
-        name = algorithm.save_name
-        project = "ssr_" + algorithm.save_dir.split("/")[-1]
+        # determine wandb mode
+        wandb_mode = getattr(algorithm.args, "wandb_mode", "offline")
+
+        if wandb_mode == "online" and not os.getenv("WANDB_API_KEY"):
+            raise ValueError("WandB API key not found in environment for online mode!")
+
+        # set project and name based on mode
+        if wandb_mode == "online" and hasattr(algorithm.args, "wandb_online_logging"):
+            project = algorithm.args.wandb_online_logging['project']
+            name = algorithm.args.wandb_online_logging['name']
+        else:
+            name = algorithm.save_name
+            project = "ssr_" + algorithm.save_dir.split("/")[-1]
+        
         group = "_".join(algorithm.args.save_name.split("_")[:-1])
 
         # tags
@@ -43,17 +55,26 @@ class WANDBHook(Hook):
         data_setting = f"setting: {algorithm.args.dataset}_lb{algorithm.args.num_labels}_ulb{algorithm.args.ulb_num_labels}"
         alg = f"alg: {algorithm.args.algorithm}"
         tags = [benchmark, dataset, data_setting, alg]
+
         if algorithm.args.resume:
             resume = "auto"
         else:
             resume = "never"
-        # resume = 'never'
 
         save_dir = os.path.join(algorithm.args.save_dir, "wandb", algorithm.args.save_name)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
-        self.run = wandb.init(name=name, tags=tags, config=algorithm.args.__dict__, project=project, group=group, resume=resume, dir=save_dir)
+        self.run = wandb.init(
+            name=name,
+            tags=tags,
+            config=algorithm.args.__dict__,
+            project=project,
+            group=group,
+            resume=resume,
+            mode=wandb_mode,
+            dir=save_dir
+        )
 
     def after_train_step(self, algorithm):
         if self.every_n_iters(algorithm, algorithm.num_log_iter):
