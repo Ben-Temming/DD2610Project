@@ -71,7 +71,7 @@ Using the PyTorch Deep Learning VM the cuda drivers are already installed. If us
 
 - create conda environment
     ```bash 
-    conda create -name ssr python=3.10 
+    conda create --name ssr python=3.10 
     conda activate ssr
     ```
 
