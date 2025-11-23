@@ -5,6 +5,7 @@
     <br>(requires method payment) -> 300$ of credits for 90 days
 - upgrade to full account https://console.cloud.google.com/welcome/ <br>(as long as you have credits you will not be charged, I think 😊)
 - request 1 GPU 
+    - Go to https://console.cloud.google.com/marketplace/product/google/compute.googleapis.com and enable Compute Engine API 
     - go to https://console.cloud.google.com/iam-admin/quotas
     - filter `GPUs (all regions)` 
     - click three dots and `Edit Quotas` 
