@@ -90,6 +90,7 @@ if __name__ == "__main__":
     set_seed(args.seed)
     args.preload = False
 
+    print(f"Using Seed: {args.seed}")
     print(f"Loading the Model: {args.load_path}")
     try:
         checkpoint = torch.load(args.load_path, map_location="cpu", weights_only=False)
