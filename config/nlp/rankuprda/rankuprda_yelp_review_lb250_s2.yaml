@@ -1,8 +1,8 @@
 algorithm: rankuprda
 save_dir: ./saved_models/nlp
-save_name: rankuprda_yelp_review_lb250_s0
+save_name: rankuprda_yelp_review_lb250_s2
 resume: True
-load_path: ./saved_models/nlp/rankuprda_yelp_review_lb250_s0/latest_model.pth
+load_path: ./saved_models/nlp/rankuprda_yelp_review_lb250_s2/latest_model.pth
 overwrite: True
 use_tensorboard: False
 use_wandb: True 
@@ -10,7 +10,7 @@ wandb_mode: online #offline
 
 wandb_online_logging: 
   project: DD2610Project
-  name: nlp_rankuprda_yelp_review_lb250_s0
+  name: nlp_rankuprda_yelp_review_lb250_s2
 
 use_aim: False
 epoch: 100
@@ -49,7 +49,7 @@ dataset: yelp_review
 train_sampler: RandomSampler
 num_workers: 4
 max_length: 512
-seed: 0
+seed: 2
 world_size: 1
 rank: 0
 multiprocessing_distributed: False
