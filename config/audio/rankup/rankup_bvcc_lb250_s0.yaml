@@ -44,7 +44,7 @@ pretrain_path: openai/whisper-base
 data_dir: ./data
 dataset: bvcc
 train_sampler: RandomSampler
-num_workers: 8
+num_workers: 1
 max_length_seconds: 6.0
 sample_rate: 16000
 preload: True
