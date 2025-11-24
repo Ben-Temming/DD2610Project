@@ -167,3 +167,39 @@ Using the PyTorch Deep Learning VM the cuda drivers are already installed. If us
     ```
 
 - eventually create multiple tmux sessions for different trainings in parallel (each training will probably be slower)
+
+
+## 5) After training 
+
+To share the models between us we upload all models to the shared project drive (saved_models folder): https://drive.google.com/drive/folders/17BZOyZw_sYjoCt-L9Pn21ajQ9BLxuBku
+
+To do this we first need to copy the models from the VM to our local machine. This can be done with the `gcloud compute scp` command. If you have not used it before you need to install it. 
+
+On Linux (or Windows WSL): 
+
+```bash
+sudo snap install google-cloud-cli --classic
+```
+
+For the first time setup run: 
+
+```bash
+gcloud init
+```
+
+Once this is done you can use the command to copy the audio files (this also copies the logs folder `wandb` that you should delete before uploading the models):
+
+```bash
+gcloud compute scp --recurse [VM_NAME]:/home/ben_temming/DD2610Project/saved_models/audio/ [LOCAL_DESTINATION_FOLDER] --zone=[YOUR_VM_ZONE]
+```
+
+Where:
+*   `VM_NAME`: is the name you gave the project (e.g `dd26102-vm`)
+*   `LOCAL_DESTINATION_FOLDER`: is where you want to copy the content
+*   `YOUR_VM_ZONE`: availability zone of your VM (e.g. `us-west1-a`)
+
+I had some permissions issues with this command, so to make sure that it works properly it is also useful to specify the user:
+
+```bash
+gcloud compute scp --recurse ben_temming@dd26102-vm:/home/ben_temming/DD2610Project/saved_models/audio/ . --zone=us-west1-a
+```
