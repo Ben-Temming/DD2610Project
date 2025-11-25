@@ -53,6 +53,17 @@ def load_model_state_dict(load_model):
     return load_state_dict
 
 
+def move_to_device(obj, device):
+    """Recursively move tensors (or their containers) onto the target device."""
+    if isinstance(obj, torch.Tensor):
+        return obj.to(device)
+    if isinstance(obj, dict):
+        return {k: move_to_device(v, device) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [move_to_device(v, device) for v in obj]
+    return obj
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -101,9 +112,12 @@ if __name__ == "__main__":
     load_model = checkpoint["ema_model"]
     load_state_dict = load_model_state_dict(load_model)
 
-    # Initialize network and load the model weights
+    # Initialize network with the same pretrained configuration used during training
     net_builder = get_net_builder(args.net, args.net_from_name)
-    net = net_builder()
+    use_pretrain = getattr(args, "use_pretrain", False)
+    pretrain_path = getattr(args, "pretrain_path", None)
+    pretrain_path = pretrain_path or None  # guard against empty strings
+    net = net_builder(pretrained=use_pretrain, pretrained_path=pretrain_path)
     net.load_state_dict(load_state_dict)
     print("Model Loaded")
 
@@ -129,7 +143,8 @@ if __name__ == "__main__":
     y_true, y_pred, x_feats = [], [], []
     with torch.no_grad():
         for data in tqdm(eval_loader, total=len(eval_loader)):
-            x, y = data["x_lb"].to(device), data["y_lb"].to(device)
+            x = move_to_device(data["x_lb"], device)
+            y = move_to_device(data["y_lb"], device)
 
             # Forward pass
             feat = net(x, only_feat=True)
