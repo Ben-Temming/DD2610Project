@@ -66,6 +66,15 @@ def get_cv_dataset(args, alg, dataset_name, num_labels, data_dir="./data", inclu
         include_lb_to_ulb=include_lb_to_ulb,
     )
 
+    if dataset_name == "cyclone":
+        # NEW DATASET: Use our custom H5 class instead of ImagePathDataset
+        lb_dset = dataset(data_dir, data=lb_data, targets=lb_targets, transform=transform_weak)
+        ulb_dset = dataset(data_dir, data=ulb_data, targets=ulb_targets, transform=transform_weak)
+    else:
+        # STANDARD LOGIC FROM BEFORE (for UTKFace, etc.)
+        lb_dset = ImageDataset(alg, lb_data, lb_targets, transform_weak, False, transform_strong)
+        ulb_dset = ImageDataset(alg, ulb_data, ulb_targets, transform_weak, True, transform_strong)
+
     lb_dset = ImageDataset(alg, lb_data, lb_targets, transform_weak, False, transform_strong)
     ulb_dset = ImageDataset(alg, ulb_data, ulb_targets, transform_weak, True, transform_strong)
 
