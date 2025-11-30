@@ -1,23 +1,23 @@
 algorithm: rankup
 save_dir: ./saved_models/classic_cv
-save_name: rankup_utkface_lb2000_s0
+save_name: rankup_utkface_lb50_s2
 resume: True
-load_path: ./saved_models/classic_cv/rankup_utkface_lb2000_s0/latest_model.pth
+load_path: ./saved_models/classic_cv/rankup_utkface_lb50_s2/latest_model.pth
 overwrite: True
 
-use_tensorboard: False
+use_tensorboard: False 
 use_wandb: True
 wandb_mode: online #offline 
 wandb_online_logging: 
-    project: DD2610Project
-    name: classic_cv_rankup_utkface_lb2000_s0
+  project: DD2610Project
+  name: classic_cv_rankup_utkface_lb50_s2
 
 use_aim: False
 epoch: 256
 num_train_iter: 262144
 num_eval_iter: 1024
 num_log_iter: 256
-num_labels: 2000
+num_labels: 50
 batch_size: 32
 eval_batch_size: 256
 ema_m: 0.999
@@ -45,9 +45,9 @@ num_workers: 4 # set to 0 for windows as there is multi-processor issue 4
 crop_ratio: 0.875
 img_size: 40
 preload: False
-seed: 0
+seed: 2
 world_size: 1
 rank: 0
 multiprocessing_distributed: False
-dist_url: tcp://127.0.0.1:10003
+dist_url: tcp://127.0.0.1:10001
 dist_backend: nccl

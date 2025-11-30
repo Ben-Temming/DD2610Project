@@ -4,8 +4,14 @@ save_name: rankup_utkface_lb50_s0
 resume: True
 load_path: ./saved_models/classic_cv/rankup_utkface_lb50_s0/latest_model.pth
 overwrite: True
-use_tensorboard: True
-use_wandb: False
+
+use_tensorboard: False 
+use_wandb: True
+wandb_mode: online #offline 
+wandb_online_logging: 
+  project: DD2610Project
+  name: classic_cv_rankup_utkface_lb50_s0
+
 use_aim: False
 epoch: 256
 num_train_iter: 262144
@@ -35,7 +41,7 @@ net_from_name: False
 data_dir: ./data
 dataset: utkface
 train_sampler: RandomSampler
-num_workers: 0 # set to 0 for windows as there is multi-processor issue 4
+num_workers: 4 # set to 0 for windows as there is multi-processor issue 4
 crop_ratio: 0.875
 img_size: 40
 preload: False
