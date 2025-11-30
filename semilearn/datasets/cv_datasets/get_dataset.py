@@ -50,7 +50,14 @@ def get_cv_dataset(args, alg, dataset_name, num_labels, data_dir="./data", inclu
     transform_strong = get_strong_transforms(crop_size=args.img_size, crop_ratio=args.crop_ratio, dataset_name=dataset_name)
     transform_val = get_val_transforms(crop_size=args.img_size, dataset_name=dataset_name)
 
-    eval_dset = ImageDataset(alg, test_data, test_targets, transform_val, False, None)
+    if dataset_name == "cyclone":
+        # Use CYCLONE class directly for evaluation
+        eval_dset = dataset(data_dir, split="test", data=test_data, targets=test_targets, transform=transform_val, is_ulb=False, alg=alg)
+    else:
+        # Standard logic
+        eval_dset = ImageDataset(alg, test_data, test_targets, transform_val, False, None)
+    #eval_dset = ImageDataset(alg, test_data, test_targets, transform_val, False, None)
+
     test_dset = None
 
     if alg == "fullysupervised":
@@ -68,15 +75,20 @@ def get_cv_dataset(args, alg, dataset_name, num_labels, data_dir="./data", inclu
 
     if dataset_name == "cyclone":
         # NEW DATASET: Use our custom H5 class instead of ImagePathDataset
-        lb_dset = dataset(data_dir, data=lb_data, targets=lb_targets, transform=transform_weak)
-        ulb_dset = dataset(data_dir, data=ulb_data, targets=ulb_targets, transform=transform_weak)
+        if dataset_name == "cyclone":
+            # NEW DATASET: Use our custom H5 class
+
+            # 1. Labeled Dataset
+            lb_dset = dataset(data_dir, split="train", data=lb_data, targets=lb_targets, transform=transform_weak, is_ulb=False, alg=alg)
+            # 2. Unlabeled Dataset
+            ulb_dset = dataset(data_dir, split="train", data=ulb_data, targets=ulb_targets, transform=transform_weak, is_ulb=True, strong_transform=transform_strong, alg=alg)
     else:
         # STANDARD LOGIC FROM BEFORE (for UTKFace, etc.)
         lb_dset = ImageDataset(alg, lb_data, lb_targets, transform_weak, False, transform_strong)
         ulb_dset = ImageDataset(alg, ulb_data, ulb_targets, transform_weak, True, transform_strong)
 
-    lb_dset = ImageDataset(alg, lb_data, lb_targets, transform_weak, False, transform_strong)
-    ulb_dset = ImageDataset(alg, ulb_data, ulb_targets, transform_weak, True, transform_strong)
+    #lb_dset = ImageDataset(alg, lb_data, lb_targets, transform_weak, False, transform_strong)
+    #ulb_dset = ImageDataset(alg, ulb_data, ulb_targets, transform_weak, True, transform_strong)
 
     if alg == "supervised":
         ulb_dset = None
