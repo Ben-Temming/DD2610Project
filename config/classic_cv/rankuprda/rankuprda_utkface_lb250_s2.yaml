@@ -1,8 +1,8 @@
 algorithm: rankuprda
 save_dir: ./saved_models/classic_cv
-save_name: rankuprda_utkface_lb250_s0
+save_name: rankuprda_utkface_lb250_s2
 resume: True
-load_path: ./saved_models/classic_cv/rankuprda_utkface_lb250_s0/latest_model.pth
+load_path: ./saved_models/classic_cv/rankuprda_utkface_lb250_s2/latest_model.pth
 overwrite: True
 use_tensorboard: False
 use_wandb: True
@@ -10,7 +10,7 @@ wandb_mode: online #offline
 
 wandb_online_logging: 
   project: DD2610Project
-  name: classic_cv_rankuprda_utkface_lb250_s0
+  name: classic_cv_rankuprda_utkface_lb250_s2
 
 use_aim: False
 epoch: 256
@@ -48,7 +48,7 @@ num_workers: 4
 crop_ratio: 0.875
 img_size: 40
 preload: False
-seed: 0
+seed: 2
 world_size: 1
 rank: 0
 multiprocessing_distributed: False
