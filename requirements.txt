@@ -21,3 +21,5 @@ wandb
 wget
 python-dotenv
 #aim
+
+coral_pytorch
