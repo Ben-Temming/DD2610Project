@@ -1,15 +1,15 @@
 algorithm: rankup
 save_dir: ./saved_models/classic_cv
-save_name: rankup_cyclone_local
-resume: True
-load_path: ./saved_models/classic_cv/rankup_cyclone_local/latest_model.pth
+save_name: rankup_cyclone_normalized
+resume: False
+load_path: ./saved_models/classic_cv/rankup_cyclone_normalized/latest_model.pth
 overwrite: True
 use_tensorboard: False
 use_wandb: True
 wandb_mode: online
 wandb_online_logging:
   project: DD2610Project
-  name: classic_cv_rankup_cyclone
+  name: classic_cv_rankup_cyclone_normalized
 
 epoch: 100
 num_train_iter: 50000
