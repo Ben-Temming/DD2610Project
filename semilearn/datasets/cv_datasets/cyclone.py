@@ -11,7 +11,6 @@ class CYCLONE(VisionDataset):
                  is_ulb=False, strong_transform=None, alg=None):
         super().__init__(root, transform=transform, target_transform=target_transform)
 
-        # 1. Standard Config
         self.alg = alg
         self.is_ulb = is_ulb
         self.strong_transform = strong_transform
@@ -20,13 +19,21 @@ class CYCLONE(VisionDataset):
         self.npy_path = f"{root}/Cyclone_Labels h5.npy"
         self.dataset_key = 'Images'
 
-        # 2. Handling Data Source
+        # Normalize intensity
+        # Found using the inspect_h5.py
+        self.max_intensity = 168
+
         if data is not None:
             self.indices = data
             self.labels = targets
         else:
             raw_labels = np.load(self.npy_path, allow_pickle=True)
             full_labels = raw_labels[:, 5].astype(np.float32)
+
+            # Normalize labels immediately upon loading
+            # full_labels = full_labels / self.max_intensity
+            # (Wait, better to normalize in __getitem__ so we can inspect real values if needed,
+            # but for RankUp stability, let's normalize the source array if it's the raw load)
 
             with h5py.File(self.h5_path, 'r') as f:
                 total_len = len(f[self.dataset_key])
@@ -39,7 +46,6 @@ class CYCLONE(VisionDataset):
                 self.indices = np.arange(split_idx, total_len)
                 self.labels = full_labels[split_idx:]
 
-        # 3. Compatibility Attributes
         self._file_paths = self.indices
         self._labels = self.labels
         self.targets = self.labels
@@ -49,15 +55,16 @@ class CYCLONE(VisionDataset):
         return len(self.indices)
 
     def __sample__(self, idx):
-        """ Internal method to load H5 data """
         real_idx = self.indices[idx]
-
         with h5py.File(self.h5_path, 'r') as f:
             img_data = f[self.dataset_key][real_idx]
 
         label = self.labels[idx]
 
-        # 4 channels -> 3 channels RGB
+        # Normalize label
+        if label > 1.0:
+            label = label / self.max_intensity
+
         img_data = img_data[:, :, :3]
         if img_data.dtype != np.uint8:
             if img_data.max() <= 1.0:
@@ -71,13 +78,10 @@ class CYCLONE(VisionDataset):
     def __getitem__(self, idx):
         img, target = self.__sample__(idx)
 
-        # Logic copied from BasicDataset to match RankUp requirements
         if self.transform is None:
-            # Fallback (shouldn't happen in training)
             from torchvision import transforms
             return {"x_lb": transforms.ToTensor()(img), "y_lb": target}
 
-        # Define all possible outputs
         data_dict = {
             "idx_lb": idx,
             "x_lb": self.transform(img),
@@ -88,16 +92,13 @@ class CYCLONE(VisionDataset):
             "x_ulb_s": self.strong_transform(img) if self.strong_transform else None,
         }
 
-        # Determine which keys to return based on is_ulb and alg
         if not self.is_ulb:
-            # Labeled Data
             return {
                 "idx_lb": data_dict["idx_lb"],
                 "x_lb": data_dict["x_lb"],
                 "y_lb": data_dict["y_lb"]
             }
         else:
-            # Unlabeled Data (RankUp requires weak and strong augs)
             return {
                 "idx_ulb": data_dict["idx_ulb"],
                 "x_ulb_w": data_dict["x_ulb_w"],
