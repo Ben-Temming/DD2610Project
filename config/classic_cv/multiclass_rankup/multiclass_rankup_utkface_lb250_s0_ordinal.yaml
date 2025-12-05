@@ -1,8 +1,8 @@
 algorithm: multiclass_rankup
 save_dir: ./saved_models/classic_cv
-save_name: multiclass_rankup_utkface_lb250_s0
+save_name: multiclass_rankup_utkface_lb250_s0_ordinal
 resume: True
-load_path: ./saved_models/classic_cv/multiclass_rankup_utkface_lb250_s0/latest_model.pth
+load_path: ./saved_models/classic_cv/multiclass_rankup_utkface_lb250_s0_ordinal/latest_model.pth
 overwrite: True
 
 use_tensorboard: False 
@@ -10,11 +10,11 @@ use_wandb: True
 wandb_mode: online #offline 
 wandb_online_logging: 
   project: DD2610Project
-  name: classic_cv_multiclass_rankup_utkface_lb250_s0
+  name: classic_cv_multiclass_rankup_utkface_lb250_s0_ordinal
 
 # Additional parameters for multiclass_rankup
 num_classes: 8 
-ordinal_ranking: False
+ordinal_ranking: True
 # choose binning strategy: "equal_width" or "quantile" (equal frequency bins)
 # quantile not working because of small labeled dataset size, so it is disabled for now
 bin_strategy: equal_width
