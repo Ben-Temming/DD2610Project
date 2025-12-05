@@ -76,7 +76,7 @@ class BasicDataset(Dataset):
     def _check_transform(self):
         """Ensure strong augmentation is used if required by the algorithm."""
         if self.strong_transform is None and self.is_ulb:
-            assert self.alg not in ["rankup"], f"alg {self.alg} requires strong augmentation"
+            assert self.alg not in ["rankup", "multiclass_rankup"], f"alg {self.alg} requires strong augmentation"
 
     def _determine_data_keys(self):
         """Determine the required output data based on the algorithm type."""
@@ -89,7 +89,7 @@ class BasicDataset(Dataset):
         # for regression algorithms
         if self.alg == "fullysupervised" or self.alg == "supervised":
             data_keys.update({"idx_ulb"})
-        elif self.alg == "rankup" or self.alg == "rankuprda":
+        elif self.alg in ["rankup", "rankuprda", "multiclass_rankup"]:
             data_keys.update({"idx_ulb", "x_ulb_w", "x_ulb_s"})
         elif self.alg == "pimodel" or self.alg == "meanteacher" or self.alg == "mixmatch":
             data_keys.update({"idx_ulb", "x_ulb_w", "x_ulb_w_2"})
