@@ -36,10 +36,11 @@ class MultiClass_RankUp_Net(nn.Module):
             reference: https://arxiv.org/abs/1901.07884, 3.2.2. Lossfunction, 3.2.3. Theoretical guarantees for classifier consistency
             """
             self.arc_classifier = CoralLayer(self.num_features, self.num_classes)
+            # Note: CoralLayer has its own initialization, don't apply init_weights, it gives an error because CoralLayer has no "bias" attribute
         else:
             # linear layer, no ordinal ranking
             self.arc_classifier = nn.Linear(self.num_features, self.num_classes)
-        self.arc_classifier.apply(init_weights)
+            self.arc_classifier.apply(init_weights)
 
     def forward(self, x, use_arc=False, targets=None, **kwargs):
         if not use_arc:
