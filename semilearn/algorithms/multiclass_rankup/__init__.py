@@ -2,3 +2,4 @@
 # Licensed under the MIT License.
 
 from .multiclass_rankup import MultiClass_RankUp
+from .bin_encoder import BinEncoder
