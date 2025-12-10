@@ -85,10 +85,12 @@ class CYCLONE(VisionDataset):
         data_dict = {
             "idx_lb": idx,
             "x_lb": self.transform(img),
-            "x_lb_s": self.strong_transform(img) if self.strong_transform else None,
             "y_lb": target,
             "idx_ulb": idx,
             "x_ulb_w": self.transform(img),
+            # MixMatch needs a second weak augmentation:
+            "x_ulb_w_2": self.transform(img),
+            # RankUp needs strong augmentation:
             "x_ulb_s": self.strong_transform(img) if self.strong_transform else None,
         }
 
@@ -99,8 +101,22 @@ class CYCLONE(VisionDataset):
                 "y_lb": data_dict["y_lb"]
             }
         else:
-            return {
-                "idx_ulb": data_dict["idx_ulb"],
-                "x_ulb_w": data_dict["x_ulb_w"],
-                "x_ulb_s": data_dict["x_ulb_s"]
-            }
+            # Select based on algorithm
+            if self.alg == "mixmatch":
+                return {
+                    "idx_ulb": data_dict["idx_ulb"],
+                    "x_ulb_w": data_dict["x_ulb_w"],
+                    "x_ulb_w_2": data_dict["x_ulb_w_2"]  # <--- Critical for MixMatch
+                }
+            elif self.alg == "rankup":
+                return {
+                    "idx_ulb": data_dict["idx_ulb"],
+                    "x_ulb_w": data_dict["x_ulb_w"],
+                    "x_ulb_s": data_dict["x_ulb_s"]
+                }
+            else:
+                # Default/Fallback
+                return {
+                    "idx_ulb": data_dict["idx_ulb"],
+                    "x_ulb_w": data_dict["x_ulb_w"]
+                }
