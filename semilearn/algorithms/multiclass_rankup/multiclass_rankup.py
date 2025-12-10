@@ -45,14 +45,14 @@ def soft_coral_loss(logits, soft_targets, mask=None):
                                             soft_targets, # soft/pseudo targets from weak augmented
                                             reduction="none")  
     
-    # apply mask, only consider confident pseudo-labels
     if mask is not None:
         loss = loss.mean(dim=1) * mask  # sample-wise mean, mask unconfident samples
-        # mean only over confident samples
-        if mask.sum() > 0:
-            loss = loss.sum() / mask.sum()
-        else:
-            loss = torch.tensor(0.0, device=logits.device)
+        # fix-to-the-fix
+        # # mean only over confident samples
+        # if mask.sum() > 0:
+        #     loss = loss.sum() / mask.sum()
+        # else:
+        #     loss = torch.tensor(0.0, device=logits.device)
     return loss.mean() # mean over batch
 
 
