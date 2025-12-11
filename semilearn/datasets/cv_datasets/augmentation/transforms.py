@@ -36,21 +36,6 @@ def get_weak_transforms(crop_size, crop_ratio, dataset_name):
 
 
 def get_strong_transforms(crop_size, crop_ratio, dataset_name):
-    if dataset_name == "cyclone":
-        # Do not change color/intensity/brightness and so on
-        return transforms.Compose([
-            transforms.Resize(crop_size),
-            transforms.RandomCrop(crop_size, padding=int(crop_size * (1 - crop_ratio)), padding_mode="reflect"),
-
-            # Geometric Augmentations
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.RandomRotation(180),
-
-            transforms.ToTensor(),
-            transforms.Normalize(mean[dataset_name.lower()], std[dataset_name.lower()]),
-        ])
-
     return transforms.Compose(
         [
             transforms.Resize(crop_size),
