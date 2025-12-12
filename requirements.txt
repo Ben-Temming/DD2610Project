@@ -20,4 +20,5 @@ transformers>=4.46.0
 wandb
 wget
 python-dotenv
+kagglehub>=0.2.9
 #aim
