@@ -7,6 +7,9 @@ mean, std = {}, {}
 mean["utkface"] = [0.59632254, 0.45671629, 0.39103324]
 std["utkface"] = [0.25907077, 0.23132719, 0.22686818]
 
+mean["crowd_counting"] = [0.53962673, 0.46390893, 0.41825833]
+std["crowd_counting"] = [0.22095851, 0.21769848, 0.20717394]
+
 
 def get_val_transforms(crop_size, dataset_name):
     return transforms.Compose(
