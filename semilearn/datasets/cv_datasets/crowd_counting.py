@@ -72,7 +72,7 @@ class CROWD_COUNTING(VisionDataset):
         # read labels from numpy file from structured dataset
         csv_file = pd.read_csv(self._labels_file)
         # first column = index -> name image integer with 6 digits = "seq{index:06d}.jpg"
-        self._file_paths = csv_file.iloc[:, 0].astype(int).apply(lambda x: self._images_folder / f"seq{x:06d}.jpg").to_numpy(dtype="object")
+        self._file_paths = csv_file.iloc[:, 0].astype(int).apply(lambda x: self._images_folder / f"seq_{x:06d}.jpg").to_numpy(dtype="object")
         # second column = label
         self._labels = csv_file.iloc[:, 1].astype(str).to_numpy(dtype=np.float32)
 
