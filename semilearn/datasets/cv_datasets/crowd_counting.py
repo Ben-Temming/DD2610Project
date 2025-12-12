@@ -16,7 +16,7 @@ from torchvision.datasets.vision import VisionDataset
 import kagglehub # pip install kagglehub
 
 
-class CrowdCounting(VisionDataset):
+class CROWD_COUNTING(VisionDataset):
     """
     https://www.kaggle.com/datasets/fmena14/crowd-counting/data
 
@@ -104,7 +104,7 @@ class CrowdCounting(VisionDataset):
         if self._check_exists():
             return
         
-        # download from kaggle
+        # download dataset from kaggle into cache and copy to self._base_folder
         path = kagglehub.download_dataset("fmena14/crowd-counting", str(self._base_folder))
         print(f"CrowdCounting dataset downloaded to {path}")
         # a copy of the dataset is saved in kagglehub's cache directory

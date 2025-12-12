@@ -4,4 +4,4 @@
 
 from .get_dataset import get_cv_dataset
 from .utkface import UTKFACE
-from .crowd_counting import CrowdCounting
+from .crowd_counting import CROWD_COUNTING
