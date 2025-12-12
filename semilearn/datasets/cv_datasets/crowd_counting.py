@@ -120,6 +120,8 @@ class CROWD_COUNTING(VisionDataset):
         print(f"CrowdCounting dataset contains {num_samples} samples.")
 
         sample = self.__getitem__(0)
-        shape_image = sample[0].shape
+        sample = PIL.Image.open(self._file_paths[0]) #.convert("RGB")
+        sample = np.array(sample)
+        shape_image = sample.shape
         print(f"Image shape: {shape_image[0]}x{shape_image[1]}x{shape_image[2]}")
 
