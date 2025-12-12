@@ -106,9 +106,9 @@ class CYCLONE(VisionDataset):
                 return {
                     "idx_ulb": data_dict["idx_ulb"],
                     "x_ulb_w": data_dict["x_ulb_w"],
-                    "x_ulb_w_2": data_dict["x_ulb_w_2"]  # <--- Critical for MixMatch
+                    "x_ulb_w_2": data_dict["x_ulb_w_2"]
                 }
-            elif self.alg == "rankup":
+            elif self.alg == "rankup" or self.alg == "rankuprda":
                 return {
                     "idx_ulb": data_dict["idx_ulb"],
                     "x_ulb_w": data_dict["x_ulb_w"],

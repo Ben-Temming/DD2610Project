@@ -1,32 +1,40 @@
-algorithm: rankup
+algorithm: rankuprda
 save_dir: ./saved_models/classic_cv
-save_name: rankup_cyclone_changedtransform
-resume: False
-load_path: ./saved_models/classic_cv/rankup_cyclone_changedtransform/latest_model.pth
+save_name: rankuprda_cyclone_lb250
+resume: True
+load_path: ./saved_models/classic_cv/rankuprda_cyclone_lb250/latest_model.pth
 overwrite: True
 use_tensorboard: False
 use_wandb: True
 wandb_mode: online
+
 wandb_online_logging:
   project: DD2610Project
-  name: classic_cv_rankup_cyclone_changedtransform
+  name: classic_cv_rankuprda_cyclone_lb250
 
+use_aim: False
 epoch: 128
 num_train_iter: 131072
 num_eval_iter: 512
 num_log_iter: 128
 num_labels: 250
 batch_size: 32
-eval_batch_size: 64
+eval_batch_size: 256
 ema_m: 0.999
+
+# RankUp+RDA Specifics
 uratio: 7
+ulb_loss_ratio: 1.0
+unsup_warm_up: 0.4
+rda_num_refine_iter: 1024
 arc_loss_ratio: 0.2
 arc_ulb_loss_ratio: 1.0
 hard_label: True
 T: 0.5
 p_cutoff: 0.95
+
 optim: SGD
-lr: 0.003
+lr: 0.01
 momentum: 0.9
 weight_decay: 0.001
 layer_decay: 1.0
@@ -37,18 +45,17 @@ criterion: l1
 net: wrn_28_2
 net_from_name: False
 
-# --- CRITICAL PATHS ---
-data_dir: ./archive      # Points to where you extracted the zip
-dataset: cyclone         # Matches the key in get_dataset.py
+# Dataset Config (Cyclone)
+data_dir: ./archive
+dataset: cyclone
 train_sampler: RandomSampler
-num_workers: 4           # Keep 0 for Windows! Change to 4 for Google Cloud.
+num_workers: 4
 crop_ratio: 0.875
-img_size: 64
-# ----------------------
-
+img_size: 64          # Crucial: Changed from 40 to 64
+preload: False
 seed: 0
 world_size: 1
 rank: 0
 multiprocessing_distributed: False
-dist_url: tcp://127.0.0.1:10002
+dist_url: tcp://127.0.0.1:10006 # Changed port to avoid conflicts
 dist_backend: nccl
