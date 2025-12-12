@@ -14,6 +14,7 @@ from torchvision.datasets.utils import verify_str_arg
 from torchvision.datasets.vision import VisionDataset
 
 import kagglehub # pip install kagglehub
+import shutil
 
 
 class CROWD_COUNTING(VisionDataset):
@@ -77,6 +78,8 @@ class CROWD_COUNTING(VisionDataset):
 
         # self._labels = np.load(self._base_folder / "labels.npy")
         # self._file_paths = np.load(self._base_folder / "images.npy")
+        self.print_info()
+
 
     def __len__(self) -> int:
         return len(self._file_paths)
@@ -104,11 +107,14 @@ class CROWD_COUNTING(VisionDataset):
         if self._check_exists():
             return
         
-        # download dataset from kaggle into cache and copy to self._base_folder
-        path = kagglehub.download_dataset("fmena14/crowd-counting", str(self._base_folder))
-        print(f"CrowdCounting dataset downloaded to {path}")
+        # download dataset from kaggle to cache
+        path = kagglehub.dataset_download("fmena14/crowd-counting")
+        # copy dataset from cache to self._base_folder
+        shutil.copytree(path, self._base_folder, dirs_exist_ok=True)
+        print(f"CrowdCounting dataset downloaded to {path} and copied to {self._base_folder}.")
         # a copy of the dataset is saved in kagglehub's cache directory
 
+    def print_info(self):
         # print some info
         num_samples = self.__len__()
         print(f"CrowdCounting dataset contains {num_samples} samples.")
