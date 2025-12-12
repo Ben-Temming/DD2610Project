@@ -8,6 +8,8 @@ mean["utkface"] = [0.59632254, 0.45671629, 0.39103324]
 std["utkface"] = [0.25907077, 0.23132719, 0.22686818]
 mean["cyclone"] = [0.70588239, 0.68448650, 0.25788743]
 std["cyclone"] = [0.25630702, 0.20469663, 0.24108123]
+mean["cyclone_standard"] = [0.70588239, 0.68448650, 0.25788743]
+std["cyclone_standard"] = [0.25630702, 0.20469663, 0.24108123]
 
 
 def get_val_transforms(crop_size, dataset_name):

@@ -77,7 +77,7 @@ def get_dataset(args, alg, dataset, num_labels, data_dir="./data", include_lb_to
     """
     from semilearn.datasets import get_cv_dataset, get_nlp_dataset, get_audio_dataset
 
-    datasets_dict = {"cv": ["utkface", "cyclone"], "audio": ["bvcc", "vcc2018"], "nlp": ["yelp_review", "amazon_review"]}
+    datasets_dict = {"cv": ["utkface", "cyclone", "cyclone_standard"], "audio": ["bvcc", "vcc2018"], "nlp": ["yelp_review", "amazon_review"]}
     registered_datasets = [item for sublist in datasets_dict.values() for item in sublist]
 
     if dataset in datasets_dict["cv"]:
