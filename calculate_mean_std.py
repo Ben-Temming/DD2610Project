@@ -1,54 +1,50 @@
-import h5py
 import numpy as np
+from PIL import Image
+import os
 from tqdm import tqdm
 
-# Paths
-H5_PATH = "archive/Cyclone_Images.h5"
-BATCH_SIZE = 1000
+# Config
+DATA_ROOT = "data/cyclone_standard"
+TRAIN_LIST = os.path.join(DATA_ROOT, "train.txt")
 
+print(f"Reading train list from {TRAIN_LIST}...")
 
-def calculate_stats():
-    print(f"Reading from {H5_PATH}...")
+# 1. Get list of image paths
+image_paths = []
+with open(TRAIN_LIST, 'r') as f:
+    for line in f:
+        path = line.strip().split()[0]  # "images/cyclone_00001.jpg"
+        full_path = os.path.join(DATA_ROOT, path)
+        image_paths.append(full_path)
 
-    with h5py.File(H5_PATH, 'r') as f:
-        # Find key
-        key = list(f.keys())[0]
-        dset = f[key]
-        total_len = len(dset)
+print(f"Found {len(image_paths)} training images. Computing stats...")
 
-        # Used for mean and sd calculations, length 3 for 3 channels
-        channel_sum = np.zeros(3, dtype=np.float64)
-        channel_sq_sum = np.zeros(3, dtype=np.float64)
-        num_pixels = 0
+# 2. Counters
+pixel_num = 0
+channel_sum = np.zeros(3)
+channel_sq_sum = np.zeros(3)
 
-        # Process in batches
-        for i in tqdm(range(0, total_len, BATCH_SIZE)):
-            # 1. Read Batch
-            batch = dset[i: i + BATCH_SIZE]
+for path in tqdm(image_paths):
+    try:
+        # Load and convert to 0-1 range numpy array
+        img = Image.open(path).convert('RGB')
+        img_np = np.array(img) / 255.0
 
-            # 2. Slice to RGB (first 3 channels)
-            batch = batch[:, :, :, :3]
+        # Reshape to (Pixels, 3)
+        pixels = img_np.reshape(-1, 3)
 
-            # 3. Normalize to [0, 1] Float
-            batch = batch.astype(np.float64)
-            if batch.max() > 1.0:
-                batch /= 255.0
+        # Accumulate
+        channel_sum += pixels.sum(axis=0)
+        channel_sq_sum += (pixels ** 2).sum(axis=0)
+        pixel_num += pixels.shape[0]
 
-            # 4. Reshape to (N_pixels, 3) to sum easily
-            pixels = batch.reshape(-1, 3)
+    except Exception as e:
+        print(f"Error reading {path}: {e}")
 
-            # 5. Accumulate
-            channel_sum += pixels.sum(axis=0)
-            channel_sq_sum += (pixels ** 2).sum(axis=0)
-            num_pixels += pixels.shape[0]
+# 3. Final Calculation
+rgb_mean = channel_sum / pixel_num
+rgb_std = np.sqrt((channel_sq_sum / pixel_num) - (rgb_mean ** 2))
 
-        # 6. Final Calculation
-        mean = channel_sum / num_pixels
-        std = np.sqrt((channel_sq_sum / num_pixels) - (mean ** 2))
-
-        print(f'mean["cyclone"] = [{mean[0]:.8f}, {mean[1]:.8f}, {mean[2]:.8f}]')
-        print(f'std["cyclone"] = [{std[0]:.8f}, {std[1]:.8f}, {std[2]:.8f}]')
-
-
-if __name__ == "__main__":
-    calculate_stats()
+print("\n--- RESULTS FOR TRANSFORMS.PY ---")
+print(f'mean["cyclone_standard"] = [{rgb_mean[0]:.8f}, {rgb_mean[1]:.8f}, {rgb_mean[2]:.8f}]')
+print(f'std["cyclone_standard"] = [{rgb_std[0]:.8f}, {rgb_std[1]:.8f}, {rgb_std[2]:.8f}]')
