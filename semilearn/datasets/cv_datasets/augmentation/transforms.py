@@ -38,44 +38,6 @@ def get_weak_transforms(crop_size, crop_ratio, dataset_name):
 
 
 def get_strong_transforms(crop_size, crop_ratio, dataset_name):
-
-    if dataset_name == "cyclone" or dataset_name == "cyclone_standard":
-
-        # We define a custom pipeline that ONLY does geometry.
-        # NO ColorJitter, NO Brightness, NO Contrast.
-        return transforms.Compose([
-            transforms.Resize(crop_size),
-
-            # Random Crop (Standard)
-            transforms.RandomResizedCrop(
-                crop_size,
-                scale=(0.2, 1.0)  # Zooming in is safe (it's just a closer look at the storm)
-            ),
-
-            # Horizontal Flip (Safe - storms look similar mirrored)
-            transforms.RandomHorizontalFlip(),
-
-            # --- THE KEY GEOMETRIC AUGMENTATIONS ---
-
-            # Rotation: Storms can be oriented any way
-            transforms.RandomRotation(degrees=180),
-
-            # Affine: Shearing/Stretching slightly
-            transforms.RandomAffine(
-                degrees=0,
-                translate=(0.1, 0.1),
-                shear=10
-            ),
-
-            transforms.ToTensor(),
-
-            # Normalize with YOUR calculated stats (from the 80% split)
-            transforms.Normalize(
-                mean=mean[dataset_name],
-                std=std[dataset_name]
-            )
-        ])
-
     return transforms.Compose(
         [
             transforms.Resize(crop_size),

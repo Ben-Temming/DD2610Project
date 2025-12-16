@@ -3,6 +3,11 @@ from PIL import Image
 import os
 from tqdm import tqdm
 
+"""
+This file computes the mean and standard deviation of the images in a directory.
+This is needed for the strong transforms in the rankup algorithm
+"""
+
 # Config
 DATA_ROOT = "data/cyclone_standard"
 TRAIN_LIST = os.path.join(DATA_ROOT, "train.txt")

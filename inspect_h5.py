@@ -1,6 +1,11 @@
 import h5py
 import numpy as np
-import os
+
+
+"""
+This file helps to figure out the structure of the Cyclone dataset as the Kaggle
+description wasn't super helpful
+"""
 
 # Paths to the files
 H5_PATH = "archive/Cyclone_Images.h5"
@@ -10,7 +15,6 @@ print(f"--- Inspecting {H5_PATH} ---")
 try:
     with h5py.File(H5_PATH, 'r') as f:
         print("Keys inside the H5 file:", list(f.keys()))
-        # Let's assume the key is the first one found
         key = list(f.keys())[0]
         print(f"Shape of data inside '{key}':", f[key].shape)
 except Exception as e:

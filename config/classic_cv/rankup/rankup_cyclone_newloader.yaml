@@ -38,14 +38,12 @@ criterion: l1
 net: wrn_28_2
 net_from_name: False
 
-# --- CRITICAL PATHS ---
-data_dir: ./data      # Points to where you extracted the zip
-dataset: cyclone_standard       # Matches the key in get_dataset.py
+data_dir: ./data
+dataset: cyclone_standard
 train_sampler: RandomSampler
-num_workers: 4           # Keep 0 for Windows! Change to 4 for Google Cloud.
+num_workers: 4
 crop_ratio: 0.875
 img_size: 40
-# ----------------------
 
 seed: 0
 world_size: 1

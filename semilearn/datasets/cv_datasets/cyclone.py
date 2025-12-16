@@ -4,6 +4,11 @@ import h5py
 from torchvision.datasets.vision import VisionDataset
 from PIL import Image
 
+"""
+This file helped with handling the data structure issues for the cyclone dataset
+Current version uses the convert_data.py script instead, and reuses the provided
+data loaders.
+"""
 
 class CYCLONE(VisionDataset):
     def __init__(self, root, split='train', transform=None, target_transform=None,
@@ -29,11 +34,6 @@ class CYCLONE(VisionDataset):
         else:
             raw_labels = np.load(self.npy_path, allow_pickle=True)
             full_labels = raw_labels[:, 5].astype(np.float32)
-
-            # Normalize labels immediately upon loading
-            # full_labels = full_labels / self.max_intensity
-            # (Wait, better to normalize in __getitem__ so we can inspect real values if needed,
-            # but for RankUp stability, let's normalize the source array if it's the raw load)
 
             with h5py.File(self.h5_path, 'r') as f:
                 total_len = len(f[self.dataset_key])

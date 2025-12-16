@@ -12,12 +12,15 @@ IMAGES_DIR = os.path.join(OUTPUT_DIR, "images")
 TRAIN_LIST = os.path.join(OUTPUT_DIR, "train.txt")
 TEST_LIST = os.path.join(OUTPUT_DIR, "test.txt")
 
+"""
+This file converts the h5 images for the cyclone dataset into the format accepted by the given codebase
+"""
+
 # 1. Setup
 os.makedirs(IMAGES_DIR, exist_ok=True)
 print("Loading labels...")
 raw_labels = np.load(NPY_PATH, allow_pickle=True)
 intensities = raw_labels[:, 5].astype(np.float32)
-max_val = 168.0
 
 # 2. Conversion Loop
 print(f"Converting images to {IMAGES_DIR}...")
@@ -30,7 +33,7 @@ with h5py.File(H5_PATH, 'r') as f:
         for idx in tqdm(range(total_len)):
             # A. Process Image
             img_data = images[idx]
-            img_data = img_data[:, :, :3]
+            img_data = img_data[:, :, :3]   # Fix the num of channels
 
             if img_data.dtype != np.uint8:
                 if img_data.max() <= 1.0:
@@ -42,8 +45,7 @@ with h5py.File(H5_PATH, 'r') as f:
             filename = f"cyclone_{idx:05d}.jpg"
             img.save(os.path.join(IMAGES_DIR, filename))
 
-            # B. Prepare Line: "images/filename.jpg normalized_target"
-            # norm_target = intensities[idx] / max_val
+            # B. Prepare Line: "images/filename.jpg target"
             raw_target = intensities[idx]
             line = f"images/{filename} {raw_target:.6f}\n"
 

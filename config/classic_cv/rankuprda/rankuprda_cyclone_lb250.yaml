@@ -46,16 +46,16 @@ net: wrn_28_2
 net_from_name: False
 
 # Dataset Config (Cyclone)
-data_dir: ./archive
-dataset: cyclone
+data_dir: ./data
+dataset: cyclone_standard
 train_sampler: RandomSampler
 num_workers: 4
 crop_ratio: 0.875
-img_size: 64          # Crucial: Changed from 40 to 64
+img_size: 40
 preload: False
 seed: 0
 world_size: 1
 rank: 0
 multiprocessing_distributed: False
-dist_url: tcp://127.0.0.1:10006 # Changed port to avoid conflicts
+dist_url: tcp://127.0.0.1:10006
 dist_backend: nccl
