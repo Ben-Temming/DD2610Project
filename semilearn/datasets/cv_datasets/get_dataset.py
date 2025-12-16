@@ -4,72 +4,66 @@
 
 from semilearn.datasets import cv_datasets
 from semilearn.datasets.utils import split_ssl_data, load_image_files
-import os
-import numpy as np
 
 from .datasetbase import BasicDataset, ImagePathDataset
 from .augmentation import get_val_transforms, get_weak_transforms, get_strong_transforms
 
 
 def get_cv_dataset(args, alg, dataset_name, num_labels, data_dir="./data", include_lb_to_ulb=True):
-    # 1. Setup Transforms
-    transform_weak = get_weak_transforms(crop_size=args.img_size, crop_ratio=args.crop_ratio, dataset_name=dataset_name)
-    transform_strong = get_strong_transforms(crop_size=args.img_size, crop_ratio=args.crop_ratio,
-                                             dataset_name=dataset_name)
-    transform_val = get_val_transforms(crop_size=args.img_size, dataset_name=dataset_name)
+    """
+    Get the computer vision dataset and split the training samples into labeled and unlabeled sets.
 
-    # 2. LOAD DATA (Branching Logic)
-    if dataset_name == "cyclone_standard":
-        # --- NEW: Load separate files for Train and Test ---
-        root = os.path.join(data_dir, "cyclone_standard")
+    Args:
+        alg (str): Algorithm.
+        dataset_name (str): The name of the dataset to load.
+        num_labels (int): The number of labeled samples for the training set.
+        data_dir (str): The directory from which to load the dataset.
+        include_lb_to_ulb (bool): Indicates whether to include labeled data in the unlabeled set.
 
-        def load_txt(filename):
-            paths = []
-            targets = []
-            with open(os.path.join(root, filename), 'r') as f:
-                for line in f:
-                    p, t = line.strip().split()
-                    paths.append(os.path.join(root, p))
-                    targets.append(float(t))
-            return np.array(paths), np.array(targets, dtype=np.float32)
+    Returns:
+        Tuple[Dataset, Dataset, Dataset, Dataset]:
+            A tuple containing:
+                - train labeled dataset
+                - train unlabeled dataset
+                - evaluation dataset
+                - test dataset
+    """
 
-        # Load TRAIN (for Labeled + Unlabeled)
-        train_data, train_targets = load_txt("train.txt")
+    dataset = getattr(cv_datasets, dataset_name.upper())
 
-        # Load TEST (for Evaluation only)
-        test_data, test_targets = load_txt("test.txt")
+    train_dataset = dataset(data_dir, split="train", download=True)
+    train_paths, train_targets = train_dataset._file_paths, train_dataset._labels
 
-        # Use Standard ImagePathDataset (Handles all algs automatically!)
+    test_dataset = dataset(data_dir, split="test", download=True)
+    test_paths, test_targets = test_dataset._file_paths, test_dataset._labels
+
+    if args.preload:
+        train_data = load_image_files(train_paths)
+        test_data = load_image_files(test_paths)
+        ImageDataset = BasicDataset
+    else:
+        train_data = train_paths
+        test_data = test_paths
         ImageDataset = ImagePathDataset
 
+    transform_weak = get_weak_transforms(crop_size=args.img_size, crop_ratio=args.crop_ratio, dataset_name=dataset_name)
+    transform_strong = get_strong_transforms(crop_size=args.img_size, crop_ratio=args.crop_ratio, dataset_name=dataset_name)
+    transform_val = get_val_transforms(crop_size=args.img_size, dataset_name=dataset_name)
+
+    if dataset_name == "cyclone":
+        # Use CYCLONE class directly for evaluation
+        eval_dset = dataset(data_dir, split="test", data=test_data, targets=test_targets, transform=transform_val, is_ulb=False, alg=alg)
     else:
-        # OLD: Standard Semilearn Logic (UTKFace, etc) ---
-        dataset = getattr(cv_datasets, dataset_name.upper())
+        # Standard logic
+        eval_dset = ImageDataset(alg, test_data, test_targets, transform_val, False, None)
+    #eval_dset = ImageDataset(alg, test_data, test_targets, transform_val, False, None)
 
-        train_dataset = dataset(data_dir, split="train", download=True)
-        train_paths, train_targets = train_dataset._file_paths, train_dataset._labels
-
-        test_dataset = dataset(data_dir, split="test", download=True)
-        test_paths, test_targets = test_dataset._file_paths, test_dataset._labels
-
-        if args.preload:
-            train_data = load_image_files(train_paths)
-            test_data = load_image_files(test_paths)
-            ImageDataset = BasicDataset
-        else:
-            train_data = train_paths
-            test_data = test_paths
-            ImageDataset = ImagePathDataset
-
-    # 3. Create Evaluation Dataset
-    eval_dset = ImageDataset(alg, test_data, test_targets, transform_val, False, None)
     test_dset = None
 
     if alg == "fullysupervised":
         lb_dset = ImageDataset(alg, train_data, train_targets, transform_weak, False, transform_strong)
         return lb_dset, None, eval_dset, test_dset
 
-    # 4. Split Labeled / Unlabeled
     lb_data, lb_targets, ulb_data, ulb_targets = split_ssl_data(
         args,
         train_data,
@@ -79,9 +73,22 @@ def get_cv_dataset(args, alg, dataset_name, num_labels, data_dir="./data", inclu
         include_lb_to_ulb=include_lb_to_ulb,
     )
 
-    # 5. Create Final Datasets
-    lb_dset = ImageDataset(alg, lb_data, lb_targets, transform_weak, False, transform_strong)
-    ulb_dset = ImageDataset(alg, ulb_data, ulb_targets, transform_weak, True, transform_strong)
+    if dataset_name == "cyclone":
+        # NEW DATASET: Use our custom H5 class instead of ImagePathDataset
+        if dataset_name == "cyclone":
+            # NEW DATASET: Use our custom H5 class
+
+            # 1. Labeled Dataset
+            lb_dset = dataset(data_dir, split="train", data=lb_data, targets=lb_targets, transform=transform_weak, is_ulb=False, alg=alg)
+            # 2. Unlabeled Dataset
+            ulb_dset = dataset(data_dir, split="train", data=ulb_data, targets=ulb_targets, transform=transform_weak, is_ulb=True, strong_transform=transform_strong, alg=alg)
+    else:
+        # STANDARD LOGIC FROM BEFORE (for UTKFace, etc.)
+        lb_dset = ImageDataset(alg, lb_data, lb_targets, transform_weak, False, transform_strong)
+        ulb_dset = ImageDataset(alg, ulb_data, ulb_targets, transform_weak, True, transform_strong)
+
+    #lb_dset = ImageDataset(alg, lb_data, lb_targets, transform_weak, False, transform_strong)
+    #ulb_dset = ImageDataset(alg, ulb_data, ulb_targets, transform_weak, True, transform_strong)
 
     if alg == "supervised":
         ulb_dset = None
